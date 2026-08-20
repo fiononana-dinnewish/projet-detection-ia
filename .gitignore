@@ -11,7 +11,10 @@ __pycache__/
 *.egg-info/
 
 # Modèle et données (versionnés par DVC, pas par Git)
-data/raw/
+data/raw/*
+
+!data/raw/*.dvc
+!data/raw/.gitkeep
 data/processed/
 *.pkl
 *.pth

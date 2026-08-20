@@ -1,0 +1,6 @@
+outs:
+- md5: fd6d27f5d7a29caf0d0fd0f29de15fc5.dir
+  size: 249381843
+  nfiles: 995
+  hash: md5
+  path: real_and_fake_image_dataset
