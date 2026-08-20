@@ -78,6 +78,7 @@ def preprocess_dataset(dataset_path, processed_path, img_size=(224, 224), train_
     print(f"Prétraitement terminé. Train: {len(train_set)}, Val: {len(val_set)}, Test: {len(test_set)}")
 
 if __name__ == "__main__":
-    dataset_path = Path(os.getcwd()).parent.parent / "data" / "raw" / "real_and_fake_image_dataset"
-    processed_path = Path(os.getcwd()).parent.parent / "data" / "processed"
+    PROJECT_ROOT = Path(__file__).resolve().parents[2]
+    dataset_path = PROJECT_ROOT / "data" / "raw" / "real_and_fake_image_dataset"
+    processed_path = PROJECT_ROOT / "data" / "processed"
     preprocess_dataset(dataset_path, processed_path)
