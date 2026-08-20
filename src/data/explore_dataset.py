@@ -1,5 +1,6 @@
 from PIL import Image
 import os
+from pathlib import Path
 
 def explore_dataset(dataset_path):
     stats = {}
@@ -39,5 +40,6 @@ def explore_dataset(dataset_path):
     return stats
 
 if __name__ == "__main__":
-    dataset_path = "D:/Aaa-Etudes/M1/Lesona IA/ProjetIA/projet-detection-ia/data/raw/real_and_fake_image_dataset/"
+    dataset_path = Path(os.getcwd()).parent.parent / "data" / "raw" / "real_and_fake_image_dataset"
+    print(f"Chemin du dataset : {dataset_path}")
     print(explore_dataset(dataset_path))
