@@ -40,6 +40,6 @@ def explore_dataset(dataset_path):
     return stats
 
 if __name__ == "__main__":
-    dataset_path = Path(os.getcwd()).parent.parent / "data" / "raw" / "real_and_fake_image_dataset"
+    dataset_path = Path(__file__).resolve().parents[2] / "data" / "raw" / "real_and_fake_image_dataset"
     print(f"Chemin du dataset : {dataset_path}")
     print(explore_dataset(dataset_path))
