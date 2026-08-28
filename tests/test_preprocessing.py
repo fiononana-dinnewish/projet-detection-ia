@@ -1,5 +1,3 @@
-import pytest
-import numpy as np
 from PIL import Image
 from pathlib import Path
 from src.data.preprocessing import preprocess_dataset
