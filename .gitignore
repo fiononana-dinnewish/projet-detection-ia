@@ -20,6 +20,7 @@ data/processed/
 *.pth
 mlruns/
 mlartifacts/
+mlflow.db
 
 # Rapports de monitoring (fichiers HTML lourds)
 monitoring/reports/*.html
