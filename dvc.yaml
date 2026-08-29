@@ -1,6 +1,6 @@
 stages:
   prepare:
-    cmd: python preprocessing.py
+    cmd: python src/data/preprocessing.py
     deps:
     - data/raw/real_and_fake_image_dataset
     - src/data/preprocessing.py
