@@ -7,3 +7,10 @@
 | 0.0005 | 98.66%             | assez instable |
 
 Prochaine étape : tester lr=0.0001 avec 25 epochs, puis évaluation sur test set.
+
+## Évaluation finale sur le jeu de test (150 images)
+- Accuracy globale : 92%
+- Recall fake : 86% (31/36)
+- Recall real : 94% (107/114)
+- AUC : 0.974
+- Modèle : ResNet18, lr=0.001, 15 epochs, freeze_backbone=True
