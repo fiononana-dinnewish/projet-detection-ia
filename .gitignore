@@ -25,6 +25,8 @@ mlflow.db
 
 # Rapports de monitoring (fichiers HTML lourds)
 monitoring/reports/*.html
+reports
+reports/*.html
 
 # Variables d'environnement (secrets)
 .env
