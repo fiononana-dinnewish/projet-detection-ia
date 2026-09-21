@@ -21,6 +21,7 @@ data/processed/
 mlruns/
 mlflow.db
 mlartifacts/
+mlflow.db
 
 # Rapports de monitoring (fichiers HTML lourds)
 monitoring/reports/*.html
