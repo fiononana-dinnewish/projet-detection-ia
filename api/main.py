@@ -1,8 +1,10 @@
-
 import logging
+import os
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from api.routers.predict import router as predict_router
 
@@ -14,6 +16,9 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]  # api/main.py -> racine du projet
+REPORTS_DIR = Path(os.getenv("REPORTS_DIR", str(PROJECT_ROOT / "monitoring" / "reports")))
+REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(
     title="Détection Images Retouchées/Générées par IA"
@@ -45,5 +50,13 @@ async def global_exception_handler(request: Request, exc: Exception):
         },
     )
 
+@app.get("/monitoring/list")
+def list_monitoring_reports():
+    reports = sorted(REPORTS_DIR.glob("*.html"), reverse=True)  # le plus récent en premier
+    return {
+        "reports": [f"http://localhost:8000/monitoring/{r.name}" for r in reports],
+        "latest": reports[0].name if reports else None,
+    }
 
 app.include_router(predict_router)
+app.mount("/monitoring", StaticFiles(directory=REPORTS_DIR, html=True), name="monitoring")
