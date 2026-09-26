@@ -7,7 +7,7 @@ import torch.optim as optim
 import mlflow
  
 from src.data.dataset_loader import get_dataloaders
-from src.models.model import build_model
+from src.models.model import build_model,unfreeze_last_block 
  
  
 def train_one_epoch(model, loader, optimizer, criterion, device):
@@ -49,6 +49,11 @@ def parse_args():
         default=True,
         help="Geler le backbone ResNet18 (n'entraîner que la dernière couche)",
     )
+    parser.add_argument(
+        "--unfreeze-last-block",
+        action="store_true",
+        help="Dégeler layer4 + fc pour fine-tuning (au lieu de juste fc)",
+    )
     return parser.parse_args()
  
  
@@ -83,11 +88,17 @@ def main():
     # --- Modèle ---
     model = build_model(num_classes=2, freeze_backbone=args.freeze_backbone).to(device)
     criterion = nn.CrossEntropyLoss()
+    
+    # Si l'option --unfreeze-last-block est utilisée, on dégèle les derniers blocs
+    model = build_model(num_classes=2, freeze_backbone=args.freeze_backbone).to(device)
+    if args.unfreeze_last_block:
+        model = unfreeze_last_block(model)
+        print("[INFO] Fine-tuning activé : layer4 + fc dégelés")
  
     # On n'entraîne que les paramètres qui ont requires_grad=True
     trainable_params = [p for p in model.parameters() if p.requires_grad]
     optimizer = optim.Adam(trainable_params, lr=args.lr)
- 
+    
     # --- Entraînement + tracking MLflow ---
     best_val_acc = 0.0
     checkpoints_dir = project_root / "models"
