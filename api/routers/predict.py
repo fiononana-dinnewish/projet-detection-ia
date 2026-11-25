@@ -4,6 +4,9 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 
 from api.schemas.prediction import PredictionResponse
 
+from api.services.model_service import predict_image
+from PIL import Image
+import io
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -53,8 +56,15 @@ async def predict(
             detail="Image file is empty.",
         )
 
-    return PredictionResponse(
-        label="real",
-        confidence=0.5,
-        model_version="v0-stub",
-    )
+    try:
+        image = Image.open(io.BytesIO(content)).convert("RGB")
+    except Exception:
+        raise HTTPException(status_code=400, detail="Impossible de lire le fichier comme une image.")
+
+    try:
+        label, confidence = predict_image(image)
+    except FileNotFoundError:
+        logger.error("Fichier modèle introuvable")
+        raise HTTPException(status_code=503, detail="Modèle non disponible.")
+
+    return PredictionResponse(label=label, confidence=confidence, model_version="v1")
