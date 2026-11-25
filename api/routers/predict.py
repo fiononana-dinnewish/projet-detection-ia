@@ -66,5 +66,8 @@ async def predict(
     except FileNotFoundError:
         logger.error("Fichier modèle introuvable")
         raise HTTPException(status_code=503, detail="Modèle non disponible.")
+    except Exception:
+        logger.exception("Erreur pendant l'inférence")
+        raise HTTPException(status_code=500, detail="Erreur pendant l'analyse de l'image.")
 
     return PredictionResponse(label=label, confidence=confidence, model_version="v1")
