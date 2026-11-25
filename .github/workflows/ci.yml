@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Installer les dépendances
+        run: |
+          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install -r api/requirements-api.txt
+          pip install pytest ruff scikit-learn httpx
+
+      - name: Lint (erreurs graves uniquement)
+        run: ruff check . --select E9,F63,F7,F82
+
+      - name: Tests
+        run: python -m pytest tests/ -v
