@@ -121,10 +121,16 @@ def main():
                 if val_acc > best_val_acc:
                     best_val_acc = val_acc
                     checkpoint_path = checkpoints_dir / "best_model.pth"
+                    class_names = [
+                        name
+                        for name, idx in sorted(class_to_idx.items(), key=lambda item: item[1])
+                    ]
                     torch.save(
                         {
                             "model_state_dict": model.state_dict(),
                             "class_to_idx": class_to_idx,
+                            "class_names": class_names,
+                            "img_size": (224, 224),
                             "val_accuracy": val_acc,
                             "epoch": epoch,
                         },
