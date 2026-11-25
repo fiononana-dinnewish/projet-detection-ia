@@ -18,7 +18,7 @@ def call_backend(image: Image.Image):
     response = requests.post(
         f"{API_URL}/predict",
         files={"file": ("image.jpg", buf, "image/jpeg")},
-        timeout=30,
+        timeout=120,
     )
     if not response.ok:
         try:
@@ -218,4 +218,4 @@ with gr.Blocks(css=CSS, title="Détection d'images par IA") as demo:
     new_img_btn.click(on_reset, outputs=[image_input, preview, result_box])
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(server_name="0.0.0.0", server_port=int(os.environ.get("PORT", 8000)))
