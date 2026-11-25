@@ -20,7 +20,12 @@ def call_backend(image: Image.Image):
         files={"file": ("image.jpg", buf, "image/jpeg")},
         timeout=30,
     )
-    response.raise_for_status()
+    if not response.ok:
+        try:
+            detail = response.json().get("detail", response.text)
+        except Exception:
+            detail = response.text
+        raise RuntimeError(f"Erreur API ({response.status_code}) : {detail}")
     data = response.json()
 
     # TODO: vérifiez auprès de Membre 3 les valeurs EXACTES renvoyées par son
