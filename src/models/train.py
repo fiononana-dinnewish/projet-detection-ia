@@ -54,12 +54,10 @@ def parse_args():
  
 def main():
     args = parse_args()
- 
-    # --- Config fixe et explicite pour MLflow (évite les surprises de config externe) ---
     project_root = Path(__file__).resolve().parents[2]
     tracking_uri = f"sqlite:///{project_root / 'mlflow.db'}"
     mlflow.set_tracking_uri(tracking_uri)
-    mlflow.set_experiment("detection-real-fake")  # créée automatiquement si elle n'existe pas
+    mlflow.set_experiment("detection-real-fake")
  
     print(f"[INFO] Tracking URI  : {mlflow.get_tracking_uri()}")
     print(f"[INFO] Expérience    : detection-real-fake")
