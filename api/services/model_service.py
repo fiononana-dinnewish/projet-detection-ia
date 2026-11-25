@@ -20,11 +20,19 @@ def get_model():
 
     checkpoint = torch.load(MODEL_PATH, map_location="cpu")
 
-    model = build_model(num_classes=2)  # TODO: mêmes arguments que lors de l'entraînement
+    model = build_model(num_classes=2, pretrained=False)  # TODO: mêmes arguments que lors de l'entraînement
     model.load_state_dict(checkpoint["model_state_dict"])  # TODO: clé exacte du checkpoint
     model.eval()
 
     class_names = checkpoint.get("class_names")  # TODO: ordre exact
+    if not class_names:
+        class_to_idx = checkpoint.get("class_to_idx")
+        if class_to_idx:
+            # reconstruit la liste triée par index (0, 1, ...)
+            class_names = [n for n, _ in sorted(class_to_idx.items(), key=lambda kv: kv[1])]
+        else:
+            # dernier recours : ordre alphabétique d'ImageFolder
+            class_names = ["fake", "real"]
     return model, class_names
 
 
