@@ -4,50 +4,47 @@ import datetime
 import numpy as np
 import gradio as gr
 from PIL import Image
+import requests
 
-_classifier = None
-try:
-    from transformers import pipeline
-    _classifier = pipeline("image-classification", model="umm-maybe/AI-image-detector")
-except Exception:
-    _classifier = None
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
-def _fallback_predict(img: Image.Image):
-    gray = np.array(img.convert("L"), dtype=np.float32)
-    fft = np.fft.fftshift(np.fft.fft2(gray))
-    mag = np.abs(fft)
-    h, w = mag.shape
-    cy, cx = h // 2, w // 2
-    r = min(h, w) // 6
-    high_freq_ratio = mag[cy - r:cy + r, cx - r:cx + r].sum() / (mag.sum() + 1e-6)
-    score_real = float(np.clip(0.95 - high_freq_ratio * 1.5, 0.5, 0.97))
-    if score_real >= 0.5:
-        return ("Image réelle", score_real, True)
-    else:
-        return ("Image générée par une IA", 1 - score_real, False)
+def call_backend(image: Image.Image):
+    """Envoie l'image au backend FastAPI (Membre 3 + modèle de Membre 2) et retourne
+    (label_fr, score, is_real)."""
+    buf = io.BytesIO()
+    image.save(buf, format="JPEG")
+    buf.seek(0)
 
-def _real_model_predict(img: Image.Image):
-    preds = _classifier(img)
-    top = max(preds, key=lambda x: x["score"])
-    label_raw = top["label"].lower()
-    is_real = "real" in label_raw or "human" in label_raw
-    if is_real:
-        label = "Image réelle"
-    else:
-        label = "Image générée par une IA"
-    return (label, float(top["score"]), is_real)
+    response = requests.post(
+        f"{API_URL}/predict",
+        files={"file": ("image.jpg", buf, "image/jpeg")},
+        timeout=30,
+    )
+    response.raise_for_status()
+    data = response.json()
+
+    # TODO: vérifiez auprès de Membre 3 les valeurs EXACTES renvoyées par son
+    # schema PredictionResponse (champ "label") — ex. "real" / "manipulated",
+    # et adaptez ce mapping en conséquence.
+    is_real = data["label"].lower() in ("real", "réelle", "reel")
+    label_fr = "Image réelle" if is_real else "Image générée par une IA"
+    return label_fr, float(data["confidence"]), is_real
 
 def analyze_image(image_path):
     if image_path is None:
         return ("—", None, "", None)
     img = Image.open(image_path).convert("RGB")
-    if _classifier is not None:
-        try:
-            label, score, is_real = _real_model_predict(img)
-        except Exception:
-            label, score, is_real = _fallback_predict(img)
-    else:
-        label, score, is_real = _fallback_predict(img)
+    
+    try:
+        label, score, is_real = call_backend(img)
+    except requests.exceptions.RequestException as e:
+        error_html = (
+            '<div style="color:#dc2626;background:#fef2f2;border:1px solid #fecaca;'
+            f'padding:15px;border-radius:10px;">Impossible de contacter le serveur '
+            f'd\'analyse. Vérifiez que l\'API est démarrée. ({e})</div>'
+        )
+        return (error_html, img, "Erreur de connexion", None)
+    
     pct = round(score * 100, 1)
     if is_real:
         color = "#15803d"
