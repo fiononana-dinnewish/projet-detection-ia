@@ -2,7 +2,7 @@ scikit-learn
 pillow
 mlflow
 evidently
-gradio=6.32.0
+gradio==6.32.0
 requests
 torch
 
