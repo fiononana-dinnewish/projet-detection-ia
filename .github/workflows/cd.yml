@@ -2,7 +2,7 @@ name: CD - Build et déploiement Render
 
 on:
   push:
-    branches: [deploy/render]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
